@@ -4,13 +4,13 @@
 于是上网查资料，了解到：
 Mask的裁剪效果是通过Stencil（模板）计算来实现的，具体一点是对目标材质的以下属性进行修改：
 
-_StencilComp
-_Stencil
-_StencilOp
-_StencilWriteMask
-_StencilReadMask
-_ColorMask
-_UseGray
+	_StencilComp
+	_Stencil
+	_StencilOp
+	_StencilWriteMask
+	_StencilReadMask
+	_ColorMask
+	_UseGray
 
 而我们自定义的Shader呢，一般是没有这些属性的，所以解决方法就是：
 
@@ -18,111 +18,109 @@ _UseGray
 
 1、添加上这些属性
 
-_StencilComp ("Stencil Comparison", Float) = 8
-_Stencil ("Stencil ID", Float) = 0
-_StencilOp ("Stencil Operation", Float) = 0
-_StencilWriteMask ("Stencil Write Mask", Float) = 255
-_StencilReadMask ("Stencil Read Mask", Float) = 255
-_ColorMask ("Color Mask", Float) = 15
-_UseGray("Boolean for gray", Float) = 0.0
+	_StencilComp ("Stencil Comparison", Float) = 8
+	_Stencil ("Stencil ID", Float) = 0
+	_StencilOp ("Stencil Operation", Float) = 0
+	_StencilWriteMask ("Stencil Write Mask", Float) = 255
+	_StencilReadMask ("Stencil Read Mask", Float) = 255
+	_ColorMask ("Color Mask", Float) = 15
+	_UseGray("Boolean for gray", Float) = 0.0
 
 2、在Pass通道里面添加如下代码
 
-Stencil
-{
-	Ref [_Stencil]
-	ReadMask [_StencilReadMask]
-	WriteMask [_StencilWriteMask]
-	Comp [_StencilComp]
-	Pass [_StencilOp]
-}
+	Stencil
+	{
+	    Ref [_Stencil]
+	    ReadMask [_StencilReadMask]
+	    WriteMask [_StencilWriteMask]
+	    Comp [_StencilComp]
+	    Pass [_StencilOp]
+	}
 
 最后完整的Shader如下（注：这个是我用于伽马矫正所使用的Shader）：
 
-<
-Shader "Custom/GammaCorrection"
-{
-    Properties
-    {
-        [PerRendererData] _MainTex ("Base (RGB)", 2D) = "black" {}
+	Shader "Custom/GammaCorrection"
+	{
+	    Properties
+	    {
+		[PerRendererData] _MainTex ("Base (RGB)", 2D) = "black" {}
 
-        _StencilComp ("Stencil Comparison", Float) = 8
-        _Stencil ("Stencil ID", Float) = 0
-        _StencilOp ("Stencil Operation", Float) = 0
-        _StencilWriteMask ("Stencil Write Mask", Float) = 255
-        _StencilReadMask ("Stencil Read Mask", Float) = 255
-        _ColorMask ("Color Mask", Float) = 15
-        _UseGray("Boolean for gray", Float) = 0.0
-    }
+		_StencilComp ("Stencil Comparison", Float) = 8
+		_Stencil ("Stencil ID", Float) = 0
+		_StencilOp ("Stencil Operation", Float) = 0
+		_StencilWriteMask ("Stencil Write Mask", Float) = 255
+		_StencilReadMask ("Stencil Read Mask", Float) = 255
+		_ColorMask ("Color Mask", Float) = 15
+		_UseGray("Boolean for gray", Float) = 0.0
+	    }
 
-    SubShader
-    {
-        Tags
-        {
-            "Queue" = "Transparent"
-            "IgnoreProjector" = "True"
-            "RenderType" = "Transparent"
-            "CanUseSpriteAtlas" = "True"
-        }
+	    SubShader
+	    {
+		Tags
+		{
+		    "Queue" = "Transparent"
+		    "IgnoreProjector" = "True"
+		    "RenderType" = "Transparent"
+		    "CanUseSpriteAtlas" = "True"
+		}
 
-        Pass
-        {
-            Stencil
-            {
-                Ref [_Stencil]
-                ReadMask [_StencilReadMask]
-                WriteMask [_StencilWriteMask]
-                Comp [_StencilComp]
-                Pass [_StencilOp]
-            }
+		Pass
+		{
+		    Stencil
+		    {
+			Ref [_Stencil]
+			ReadMask [_StencilReadMask]
+			WriteMask [_StencilWriteMask]
+			Comp [_StencilComp]
+			Pass [_StencilOp]
+		    }
 
-            Blend SrcAlpha OneMinusSrcAlpha
+		    Blend SrcAlpha OneMinusSrcAlpha
 
-            CGPROGRAM
-			
-            #pragma vertex vert
-            #pragma fragment frag
+		    CGPROGRAM
 
-            #include "UnityCG.cginc"
+		    #pragma vertex vert
+		    #pragma fragment frag
 
-            sampler2D _MainTex;
+		    #include "UnityCG.cginc"
 
-            struct appdata_t
-            {
-                float4 vertex : POSITION;
-                float2 texcoord : TEXCOORD0;
-                fixed4 color : COLOR;
-            };
-            
+		    sampler2D _MainTex;
 
-            struct v2f
-            {
-                float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-		        		fixed4 color : COLOR;
-            };
+		    struct appdata_t
+		    {
+			float4 vertex : POSITION;
+			float2 texcoord : TEXCOORD0;
+			fixed4 color : COLOR;
+		    };
 
-            v2f vert(appdata_t i)
-            {
-                v2f o;
-                o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
-                o.uv = i.texcoord;
-			        	o.color = i.color;
+		    struct v2f
+		    {
+			float4 pos : SV_POSITION;
+			float2 uv : TEXCOORD0;
+			fixed4 color : COLOR;
+		    };
 
-                return o;
-            }
+		    v2f vert(appdata_t i)
+		    {
+			v2f o;
+			o.pos = mul(UNITY_MATRIX_MVP, i.vertex);
+			o.uv = i.texcoord;
+			o.color = i.color;
 
-            float4 frag(v2f i) : SV_Target
-            {
-                float4 fragColor = pow(tex2D(_MainTex, i.uv), 2.2) * i.color;
+			return o;
+		    }
 
-                return fragColor;
-            }
+		    float4 frag(v2f i) : SV_Target
+		    {
+			float4 fragColor = pow(tex2D(_MainTex, i.uv), 2.2) * i.color;
 
-            ENDCG
-        }
-    } 
+			return fragColor;
+		    }
 
-    FallBack "Diffuse"
-}
->
+		    ENDCG
+		}
+	    } 
+
+	    FallBack "Diffuse"
+	}
+
