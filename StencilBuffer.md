@@ -39,6 +39,7 @@ Stencil
 
 最后完整的Shader如下（注：这个是我用于伽马矫正所使用的Shader）：
 
+<
 Shader "Custom/GammaCorrection"
 {
     Properties
@@ -124,3 +125,4 @@ Shader "Custom/GammaCorrection"
 
     FallBack "Diffuse"
 }
+>
