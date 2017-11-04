@@ -1,8 +1,8 @@
 # \<UNITY3D-UGUI\> —— Mask裁剪非默认材质UI
 
-在制作UI界面时，由于现在游戏的颜色空间切换到了Linear空间下，所以我得对UI图标进行伽马矫正。  <br />
-但是当我把伽马矫正的Shader挂上去之后，发现滑动Panel时，矫正后的UI不接受Mask裁剪。  <br />
-于是上网查资料了解到：Mask的裁剪效果是通过Stencil（模板）计算来实现的，具体就是对目标材质的以下属性进行修改：  <br />
+&emsp;&emsp; 在制作UI界面时，由于现在游戏的颜色空间切换到了Linear空间下，所以我得对UI图标进行伽马矫正。  <br />
+&emsp;&emsp; 但是当我把伽马矫正的Shader挂上去之后，发现滑动Panel时，矫正后的UI不接受Mask裁剪。  <br />
+&emsp;&emsp; 于是上网查资料了解到：Mask的裁剪效果是通过Stencil（模板）计算来实现的，具体就是对目标材质的以下属性进行修改：  <br />
 
 	_StencilComp
 	_Stencil
@@ -12,9 +12,9 @@
 	_ColorMask
 	_UseGray
 
-而我们自定义的Shader呢，一般是没有这些属性的，所以解决方法就是在我们写自定义Shader时：  <br />
+&emsp;&emsp; 而我们自定义的Shader呢，一般是没有这些属性的，所以解决方法就是在我们写自定义Shader时：  <br />
 
-1.添加上这些属性  <br />
+&emsp;&emsp; 1.添加上这些属性  <br />
 
 	_StencilComp ("Stencil Comparison", Float) = 8
 	_Stencil ("Stencil ID", Float) = 0
@@ -24,7 +24,7 @@
 	_ColorMask ("Color Mask", Float) = 15
 	_UseGray("Boolean for gray", Float) = 0.0
 
-2.在Pass通道里面添加如下代码  <br />
+&emsp;&emsp; 2.在Pass通道里面添加如下代码  <br />
 
 	Stencil
 	{
@@ -35,7 +35,7 @@
 	    Pass [_StencilOp]
 	}
 
-最后完整的Shader如下（注：这个是我用于伽马矫正所使用的Shader）：  <br />
+&emsp;&emsp; 最后完整的Shader如下（注：这个是我用于伽马矫正所使用的Shader）：  <br />
 
 	Shader "Custom/GammaCorrection"
 	{
